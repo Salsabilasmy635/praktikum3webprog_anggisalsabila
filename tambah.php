@@ -15,22 +15,121 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html>
+<head>
+    <title>Tambah Mahasiswa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0a0e1a; --surface: #111827; --surface2: #1a2236;
+            --border: #1e2d45; --accent: #3b82f6; --accent2: #06b6d4;
+            --danger: #ef4444; --text: #e2e8f0; --muted: #64748b; --dim: #94a3b8;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh;
+            background-image: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(59,130,246,0.12), transparent);
+        }
+        .navbar {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(10,14,26,0.9); backdrop-filter: blur(18px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 1.5rem; height: 58px;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .brand { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; display: flex; align-items: center; gap: 9px; }
+        .brand-icon { width: 30px; height: 30px; background: linear-gradient(135deg, var(--accent), var(--accent2)); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 13px; }
+        .nav-back { color: var(--muted); text-decoration: none; font-size: 0.82rem; transition: color 0.2s; }
+        .nav-back:hover { color: var(--text); }
+
+        .wrap { max-width: 520px; margin: 2.5rem auto; padding: 0 1.25rem; }
+        .crumb { font-size: 0.75rem; color: var(--muted); margin-bottom: 0.5rem; }
+        .crumb a { color: var(--accent); text-decoration: none; }
+
+        /* h2 ASLI */
+        h2 { font-family: 'Syne', sans-serif; font-size: 1.7rem; font-weight: 800; letter-spacing: -0.04em; margin-bottom: 1.5rem; }
+        h2 span { background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 1.75rem; }
+
+        /* FORM — struktur label+input ASLI, hanya styling */
+        label { display: block; font-size: 0.75rem; font-weight: 500; color: var(--dim); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.45rem; margin-top: 1.1rem; }
+        label:first-of-type { margin-top: 0; }
+
+        input[type="text"] {
+            display: block; width: 100%;
+            background: var(--surface2); border: 1px solid var(--border);
+            border-radius: 10px; padding: 0.7rem 1rem;
+            color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+            outline: none; transition: all 0.2s;
+        }
+        input[type="text"]::placeholder { color: var(--muted); }
+        input[type="text"]:focus { border-color: var(--accent); background: rgba(59,130,246,0.05); box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+
+        .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+        .form-actions { display: flex; gap: 0.7rem; justify-content: flex-end; }
+
+        /* Button ASLI */
+        button[type="submit"] {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 0.6rem 1.4rem; border-radius: 9px;
+            background: linear-gradient(135deg, var(--accent), #2563eb);
+            border: none; color: white; font-size: 0.83rem;
+            font-family: 'DM Sans', sans-serif; font-weight: 500; cursor: pointer;
+            transition: all 0.2s; box-shadow: 0 4px 14px rgba(59,130,246,0.3);
+        }
+        button[type="submit"]:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(59,130,246,0.45); }
+
+        /* Link Batal ASLI */
+        a.btn-batal {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 0.6rem 1.2rem; border-radius: 9px;
+            background: var(--surface2); border: 1px solid var(--border);
+            color: var(--dim); text-decoration: none; font-size: 0.83rem;
+            font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+        }
+        a.btn-batal:hover { border-color: var(--muted); color: var(--text); }
+
+        @media(max-width:480px){ .wrap{padding:0 1rem; margin-top:1.5rem;} .card{padding:1.25rem;} .form-actions{flex-direction:column-reverse;} .form-actions a, .form-actions button{width:100%;justify-content:center;} }
+    </style>
+</head>
 <body>
-    <h2>Tambah Mahasiswa</h2>
-    <form method="POST" action="">
-        <label>NIM:</label><br>
-        <input type="text" name="npm" required><br>
 
-        <label>Nama:</label><br>
-        <input type="text" name="nama" required><br>
-        
-        <label>Jurusan:</label><br>
-        <input type="text" name="jurusan" required><br><br>
+<nav class="navbar">
+    <div class="brand"><div class="brand-icon">🎓</div> SiAkademik</div>
+    <a href="index.php" class="nav-back">← Kembali ke Daftar</a>
+</nav>
 
-        <button type="submit">Simpan Data</button>
-        <a href="index.php">Batal</a>
-    </form>
+<div class="wrap">
+    <div class="crumb"><a href="index.php">Beranda</a> › Tambah Mahasiswa</div>
+
+    <!-- h2 ASLI -->
+    <h2>Tambah <span>Mahasiswa</span></h2>
+
+    <div class="card">
+        <!-- FORM ASLI — method, action, name, required tidak diubah -->
+        <form method="POST" action="">
+            <label>NIM:</label>
+            <input type="text" name="npm" required placeholder="Contoh: 123456789012">
+
+            <label>Nama:</label>
+            <input type="text" name="nama" required placeholder="Contoh: Budi Santoso">
+
+            <label>Jurusan:</label>
+            <input type="text" name="jurusan" required placeholder="Contoh: Teknik Informatika">
+
+            <div class="divider"></div>
+
+            <div class="form-actions">
+                <!-- Link Batal ASLI -->
+                <a href="index.php" class="btn-batal">✕ Batal</a>
+                <!-- Button ASLI -->
+                <button type="submit">💾 Simpan Data</button>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>
