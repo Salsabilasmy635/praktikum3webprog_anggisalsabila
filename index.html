@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FilmFav — Koleksi Film Favorit</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080b10; --surface:#0f1520; --card:#131c2a; --card-hover:#172133;
+  --border:#1e2d42; --border2:#253650;
+  --accent:#4a9eff; --accent2:#ff6b35;
+  --gold:#ffc845; --green:#3ecf8e; --red:#ff4757; --purple:#b06eff;
+  --text:#e8edf5; --text2:#8fa8c8; --text3:#4d6a8a;
+  --font-title:'Bebas Neue',sans-serif;
+  --font-body:'DM Sans',sans-serif;
+  --radius:14px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 20% 0%,rgba(74,158,255,.07) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 100%,rgba(255,107,53,.05) 0%,transparent 60%);pointer-events:none;z-index:0;}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,4vw,48px);height:64px;background:rgba(8,11,16,.88);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:var(--font-title);font-size:1.7rem;letter-spacing:2px;display:flex;align-items:center;gap:4px;}
+.nav-logo span{color:var(--accent2);}
+.nav-links{display:flex;gap:28px;list-style:none;}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:.88rem;font-weight:500;transition:color .2s;}
+.nav-links a:hover,.nav-links a.active{color:var(--text);}
+.btn-add-nav{background:var(--accent2);color:#fff;border:none;padding:8px 20px;border-radius:8px;font-family:var(--font-body);font-weight:600;font-size:.85rem;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.btn-add-nav:hover{filter:brightness(1.15);transform:translateY(-1px);}
+
+/* HERO */
+.hero{position:relative;z-index:1;min-height:400px;display:flex;align-items:flex-end;padding:clamp(16px,4vw,48px);padding-top:60px;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(to top,var(--bg) 0%,rgba(8,11,16,.6) 45%,rgba(8,11,16,.2) 100%),linear-gradient(135deg,#0d1f35 0%,#0a1525 50%,#0f0d1a 100%);}
+.hero-bg::after{content:'';position:absolute;inset:0;background-image:radial-gradient(1px 1px at 15% 25%,rgba(255,255,255,.5),transparent),radial-gradient(1px 1px at 35% 65%,rgba(255,255,255,.3),transparent),radial-gradient(1px 1px at 72% 18%,rgba(255,255,255,.4),transparent),radial-gradient(1px 1px at 88% 48%,rgba(255,255,255,.2),transparent),radial-gradient(2px 2px at 22% 88%,rgba(74,158,255,.5),transparent),radial-gradient(2px 2px at 92% 12%,rgba(255,107,53,.4),transparent),radial-gradient(1px 1px at 58% 75%,rgba(255,200,69,.3),transparent);}
+.hero-content{position:relative;z-index:2;max-width:680px;}
+.hero-eyebrow{font-size:.72rem;font-weight:600;color:var(--accent2);letter-spacing:3px;text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.hero-eyebrow::before{content:'';display:block;width:24px;height:2px;background:var(--accent2);}
+.hero-title{font-family:var(--font-title);font-size:clamp(2.6rem,8vw,4.8rem);line-height:.95;letter-spacing:1px;margin-bottom:14px;}
+.hero-title em{color:var(--accent);font-style:normal;}
+.hero-sub{font-size:clamp(.82rem,2vw,.95rem);color:var(--text2);line-height:1.65;max-width:480px;margin-bottom:28px;}
+.hero-stats{display:flex;gap:clamp(20px,4vw,40px);flex-wrap:wrap;}
+.stat-num{font-family:var(--font-title);font-size:clamp(1.5rem,4vw,2.2rem);color:var(--text);line-height:1;}
+.stat-num span{color:var(--accent);font-size:.7em;}
+.stat-label{font-size:.68rem;color:var(--text3);letter-spacing:1.5px;text-transform:uppercase;margin-top:2px;}
+
+/* MAIN */
+main{position:relative;z-index:1;padding:0 clamp(16px,4vw,48px) 80px;}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin:40px 0 20px;gap:16px;flex-wrap:wrap;}
+.section-title{font-family:var(--font-title);font-size:clamp(1.3rem,4vw,1.7rem);letter-spacing:1px;}
+.filter-row{display:flex;gap:8px;flex-wrap:wrap;}
+.filter-btn{padding:6px 16px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-family:var(--font-body);font-size:.78rem;font-weight:500;cursor:pointer;transition:all .2s;}
+.filter-btn:hover{border-color:var(--accent);color:var(--accent);}
+.filter-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+/* GRID */
+.film-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(280px,100%),1fr));gap:20px;}
+
+/* CARD */
+.film-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;transition:all .3s cubic-bezier(.4,0,.2,1);cursor:pointer;animation:fadeUp .4s ease both;}
+.film-card:hover{transform:translateY(-6px);border-color:var(--border2);box-shadow:0 24px 64px rgba(0,0,0,.6),0 0 0 1px rgba(74,158,255,.08);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.card-poster{width:100%;aspect-ratio:16/9;background:var(--surface);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.card-poster-bg{position:absolute;inset:0;}
+.card-poster-icon{position:relative;z-index:1;font-size:3rem;opacity:.25;filter:grayscale(.3);}
+.card-poster-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(8,11,16,.9) 0%,transparent 60%);}
+.card-rating-badge{position:absolute;top:12px;right:12px;z-index:2;width:46px;height:46px;background:rgba(8,11,16,.82);border:2px solid var(--gold);border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;backdrop-filter:blur(8px);}
+.card-rating-num{font-family:var(--font-title);font-size:1rem;line-height:1;color:var(--gold);}
+.card-rating-star{font-size:.5rem;color:var(--gold);}
+.card-year-badge{position:absolute;top:12px;left:12px;z-index:2;background:rgba(8,11,16,.75);backdrop-filter:blur(8px);border:1px solid var(--border2);border-radius:6px;padding:3px 8px;font-size:.7rem;font-weight:600;color:var(--text2);letter-spacing:1px;}
+
+.card-body{padding:16px;}
+.card-genre{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;}
+.genre-action  {background:rgba(255,71,87,.14); color:#ff6b7a; border:1px solid rgba(255,71,87,.25);}
+.genre-drama   {background:rgba(74,158,255,.14);color:#4a9eff; border:1px solid rgba(74,158,255,.25);}
+.genre-horror  {background:rgba(176,110,255,.14);color:#b06eff;border:1px solid rgba(176,110,255,.25);}
+.genre-comedy  {background:rgba(255,200,69,.14); color:#ffc845; border:1px solid rgba(255,200,69,.25);}
+.genre-romance {background:rgba(255,107,53,.14); color:#ff6b35; border:1px solid rgba(255,107,53,.25);}
+.genre-animation{background:rgba(62,207,142,.14);color:#3ecf8e;border:1px solid rgba(62,207,142,.25);}
+.genre-scifi   {background:rgba(0,220,255,.14);  color:#00dcff; border:1px solid rgba(0,220,255,.25);}
+.genre-default {background:rgba(143,168,200,.1); color:var(--text2);border:1px solid var(--border2);}
+
+.card-title{font-family:var(--font-title);font-size:1.22rem;letter-spacing:.5px;line-height:1.1;margin-bottom:6px;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.card-review{font-size:.78rem;color:var(--text2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:12px;min-height:2.4em;}
+.card-stars{display:flex;gap:2px;margin-bottom:14px;}
+.star{font-size:.82rem;color:var(--border2);}
+.star.filled{color:var(--gold);}
+.star.half{color:var(--gold);opacity:.55;}
+.card-footer{display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--border);}
+.btn-edit,.btn-delete{flex:1;padding:7px 0;border-radius:8px;font-family:var(--font-body);font-size:.76rem;font-weight:600;cursor:pointer;transition:all .15s;border:1px solid;}
+.btn-edit{background:transparent;color:var(--accent);border-color:rgba(74,158,255,.3);}
+.btn-edit:hover{background:rgba(74,158,255,.1);border-color:var(--accent);}
+.btn-delete{background:transparent;color:var(--red);border-color:rgba(255,71,87,.3);}
+.btn-delete:hover{background:rgba(255,71,87,.1);border-color:var(--red);}
+
+/* SKELETON */
+.skeleton-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+.skeleton-poster{width:100%;aspect-ratio:16/9;background:var(--surface);}
+.skeleton-body{padding:16px;display:flex;flex-direction:column;gap:10px;}
+.skeleton-line{height:12px;border-radius:6px;background:linear-gradient(90deg,var(--surface) 25%,var(--border) 50%,var(--surface) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;}
+.skeleton-line.s{width:55%}.skeleton-line.m{width:80%}
+@keyframes shimmer{to{background-position:-200% 0}}
+
+/* EMPTY STATE */
+.empty-state{grid-column:1/-1;text-align:center;padding:80px 20px;}
+.empty-icon{font-size:4rem;margin-bottom:16px;opacity:.35;}
+.empty-title{font-family:var(--font-title);font-size:1.6rem;color:var(--text2);margin-bottom:8px;}
+.empty-sub{font-size:.85rem;color:var(--text3);}
+
+/* DETAIL OVERLAY */
+.detail-overlay{position:fixed;inset:0;z-index:150;background:rgba(5,8,15,.92);backdrop-filter:blur(14px);overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .3s;}
+.detail-overlay.open{opacity:1;pointer-events:all;}
+.detail-inner{max-width:800px;margin:0 auto;padding:clamp(16px,4vw,48px);min-height:100vh;display:flex;flex-direction:column;justify-content:center;}
+.detail-back{display:inline-flex;align-items:center;gap:8px;color:var(--text2);font-size:.85rem;font-weight:500;cursor:pointer;border:none;background:none;margin-bottom:32px;transition:color .2s;}
+.detail-back:hover{color:var(--text);}
+.detail-back::before{content:'←';font-size:1.1rem;}
+.detail-header{display:flex;gap:clamp(16px,4vw,32px);margin-bottom:28px;flex-wrap:wrap;align-items:flex-start;}
+.detail-poster{width:clamp(100px,22vw,150px);aspect-ratio:2/3;background:var(--surface);border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:3rem;border:1px solid var(--border2);}
+.detail-info{flex:1;min-width:180px;}
+.detail-title{font-family:var(--font-title);font-size:clamp(1.8rem,6vw,3rem);line-height:.95;letter-spacing:1px;margin-bottom:12px;}
+.detail-meta{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px;font-size:.82rem;color:var(--text2);}
+.detail-stars{display:flex;gap:4px;margin-bottom:4px;}
+.detail-stars .star{font-size:1.1rem;}
+.detail-rc{width:76px;height:76px;border-radius:50%;border:3px solid var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(255,200,69,.07);flex-shrink:0;}
+.detail-rnum{font-family:var(--font-title);font-size:1.7rem;line-height:1;color:var(--gold);}
+.detail-rlabel{font-size:.58rem;color:var(--text3);letter-spacing:1px;text-transform:uppercase;}
+.review-label{font-size:.72rem;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text3);margin-bottom:8px;}
+.review-body{font-size:.92rem;color:var(--text2);line-height:1.75;padding:16px;border-radius:10px;background:var(--surface);border:1px solid var(--border);}
+.detail-actions{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap;}
+.d-btn{padding:11px 28px;border-radius:10px;font-family:var(--font-body);font-weight:600;font-size:.9rem;cursor:pointer;transition:all .2s;border:1px solid;}
+.d-btn-edit{background:var(--accent);border-color:var(--accent);color:#fff;}
+.d-btn-edit:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.d-btn-del{background:transparent;border-color:var(--red);color:var(--red);}
+.d-btn-del:hover{background:rgba(255,71,87,.1);}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;z-index:200;background:rgba(5,8,15,.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .25s;}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{background:var(--card);border:1px solid var(--border2);border-radius:20px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;padding:clamp(20px,4vw,32px);transform:translateY(20px) scale(.97);transition:transform .25s cubic-bezier(.4,0,.2,1);box-shadow:0 40px 100px rgba(0,0,0,.8);}
+.modal-overlay.open .modal{transform:translateY(0) scale(1);}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.modal-title{font-family:var(--font-title);font-size:1.6rem;letter-spacing:1px;}
+.modal-close{width:32px;height:32px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text2);font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.modal-close:hover{background:var(--border);color:var(--text);}
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:.72rem;font-weight:600;color:var(--text3);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:11px 14px;color:var(--text);font-family:var(--font-body);font-size:.9rem;outline:none;transition:border-color .2s;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(74,158,255,.1);}
+.form-input::placeholder,.form-textarea::placeholder{color:var(--text3);}
+.form-select option{background:var(--surface);}
+.form-textarea{resize:vertical;min-height:80px;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.rating-wrap{display:flex;align-items:center;gap:12px;}
+.rating-wrap .form-input{flex:1;}
+.rating-prev{font-family:var(--font-title);font-size:1.4rem;color:var(--gold);min-width:40px;text-align:center;}
+.btn-submit{width:100%;padding:13px;background:linear-gradient(135deg,var(--accent) 0%,#2d7dd6 100%);color:#fff;border:none;border-radius:10px;font-family:var(--font-body);font-weight:700;font-size:.95rem;cursor:pointer;transition:all .2s;margin-top:8px;letter-spacing:.3px;}
+.btn-submit:hover{filter:brightness(1.1);transform:translateY(-1px);}
+.btn-submit:disabled{opacity:.6;cursor:not-allowed;transform:none;}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:999;display:flex;flex-direction:column;gap:10px;pointer-events:none;}
+.toast{background:var(--card);border:1px solid var(--border2);border-radius:12px;padding:12px 18px;display:flex;align-items:center;gap:10px;font-size:.84rem;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,.5);transform:translateX(120%);transition:transform .35s cubic-bezier(.4,0,.2,1);pointer-events:all;min-width:230px;max-width:320px;}
+.toast.show{transform:translateX(0);}
+.toast.success{border-left:3px solid var(--green);}
+.toast.error{border-left:3px solid var(--red);}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .nav-links{display:none;}
+  .form-row{grid-template-columns:1fr;}
+  .hero{padding-top:36px;min-height:300px;}
+}
+@media(max-width:420px){.film-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">Film<span>Fav</span></div>
+  <ul class="nav-links">
+    <li><a href="#" class="active">Home</a></li>
+    <li><a href="#koleksi">Koleksi</a></li>
+  </ul>
+  <button class="btn-add-nav" onclick="openAdd()">+ Tambah Film</button>
+</nav>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Koleksi Pribadi</div>
+    <h1 class="hero-title">Film <em>Favorit</em><br>Saya</h1>
+    <p class="hero-sub">Kumpulan film terbaik dengan rating & review personal — dikelola lewat REST API.</p>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num" id="s-total">—</div>
+        <div class="stat-label">Total Film</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="s-avg">—<span>/10</span></div>
+        <div class="stat-label">Rata-rata Rating</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" id="s-genre">—</div>
+        <div class="stat-label">Genre</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main>
+  <div id="koleksi">
+    <div class="section-header">
+      <h2 class="section-title">Semua Film</h2>
+      <div class="filter-row" id="filters">
+        <button class="filter-btn active" onclick="doFilter('all',this)">Semua</button>
+      </div>
+    </div>
+    <div class="film-grid" id="grid">
+      <div class="skeleton-card"><div class="skeleton-poster"></div><div class="skeleton-body"><div class="skeleton-line s"></div><div class="skeleton-line m"></div><div class="skeleton-line s"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton-poster"></div><div class="skeleton-body"><div class="skeleton-line s"></div><div class="skeleton-line m"></div><div class="skeleton-line s"></div></div></div>
+      <div class="skeleton-card"><div class="skeleton-poster"></div><div class="skeleton-body"><div class="skeleton-line s"></div><div class="skeleton-line m"></div><div class="skeleton-line s"></div></div></div>
+    </div>
+  </div>
+</main>
+
+<!-- DETAIL -->
+<div class="detail-overlay" id="detail-ov">
+  <div class="detail-inner">
+    <button class="detail-back" onclick="closeDetail()">Kembali ke Koleksi</button>
+    <div id="detail-body"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modal-ov" onclick="bgClose(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title" id="modal-ttl">Tambah Film</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <form onsubmit="submitForm(event)">
+      <input type="hidden" id="fid">
+      <div class="form-group">
+        <label class="form-label">Judul Film</label>
+        <input class="form-input" id="f-judul" placeholder="Contoh: Interstellar" required>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Genre</label>
+          <select class="form-select" id="f-genre" required>
+            <option value="">Pilih Genre</option>
+            <option>Action</option><option>Drama</option><option>Horror</option>
+            <option>Comedy</option><option>Romance</option><option>Animation</option>
+            <option>Sci-Fi</option><option>Thriller</option><option>Fantasy</option>
+            <option>Documentary</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tahun Rilis</label>
+          <input class="form-input" id="f-tahun" type="number" placeholder="2024" min="1900" max="2099" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Rating (0 – 10)</label>
+        <div class="rating-wrap">
+          <input class="form-input" id="f-rating" type="number" placeholder="8.5" min="0" max="10" step="0.1" required oninput="prevRating(this.value)">
+          <div class="rating-prev" id="r-prev">—</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Review / Deskripsi</label>
+        <textarea class="form-textarea" id="f-review" placeholder="Tulis review singkat..."></textarea>
+        <div class="form-group">
+            <label class="form-label">Link Poster (URL Gambar)</label>
+            <input class="form-input" id="f-poster" placeholder="https://....jpg">
+        </div>
+      </div>
+      <button type="submit" class="btn-submit" id="btn-sub">Simpan Film</button>
+    </form>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toasts"></div>
+
+<script>
+const API = 'http://localhost/api';
+let films = [], activeF = 'all';
+
+/* ── LOAD ── */
+async function load() {
+  try {
+    const r = await fetch(`${API}/read.php`);
+    films = r.ok ? await r.json() : [];
+  } catch { films = []; }
+  buildFilters(); render(films); stats(films);
+}
+
+/* ── RENDER ── */
+function render(list) {
+  const g = document.getElementById('grid');
+  if (!list.length) {
+    g.innerHTML = `<div class="empty-state"><div class="empty-icon">🎬</div><div class="empty-title">Belum Ada Film</div><div class="empty-sub">Klik "+ Tambah Film" untuk memulai</div></div>`;
+    return;
+  }
+  g.innerHTML = list.map((f,i) => `
+        <div class="film-card" style="animation-delay:${i*.07}s" onclick="openDetail(${f.id})">
+    <div class="card-poster">
+        ${f.poster 
+            ? `<img src="${f.poster}" style="width:100%;height:100%;object-fit:cover;">`
+            : `<div class="card-poster-icon">🎬</div>`
+        }
+        <div class="card-poster-overlay"></div>
+        <div class="card-year-badge">${f.tahun}</div>
+        <div class="card-rating-badge">
+            <div class="card-rating-num">${(+f.rating).toFixed(1)}</div>
+            <div class="card-rating-star">★</div>
+        </div>
+    </div>
+    <div class="card-body">
+      <span class="card-genre ${gc(f.genre)}">${f.genre}</span>
+      <div class="card-title">${f.judul}</div>
+      <div class="card-review">${f.review||'<em style="opacity:.4">Belum ada review</em>'}</div>
+      <div class="card-stars">${stars(f.rating)}</div>
+      <div class="card-footer">
+        <button class="btn-edit" onclick="event.stopPropagation();openEdit(${f.id})">✏ Edit</button>
+        <button class="btn-delete" onclick="event.stopPropagation();del(${f.id},'${esc(f.judul)}')">✕ Hapus</button>
+      </div>
+    </div>
+  </div>`).join('');
+}
+
+/* ── STATS ── */
+function stats(list) {
+  document.getElementById('s-total').textContent = list.length;
+  document.getElementById('s-avg').innerHTML = list.length
+    ? `${(list.reduce((s,f)=>s+(+f.rating),0)/list.length).toFixed(1)}<span>/10</span>` : '—<span>/10</span>';
+  document.getElementById('s-genre').textContent = [...new Set(list.map(f=>f.genre))].length || '—';
+}
+
+/* ── FILTERS ── */
+function buildFilters() {
+  const genres = ['all',...new Set(films.map(f=>f.genre))];
+  document.getElementById('filters').innerHTML = genres.map(g=>`
+    <button class="filter-btn ${g===activeF?'active':''}" onclick="doFilter('${g}',this)">${g==='all'?'Semua':g}</button>`).join('');
+}
+function doFilter(g,btn) {
+  activeF = g;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  render(g==='all'?films:films.filter(f=>f.genre===g));
+}
+
+/* ── DETAIL ── */
+function openDetail(id) {
+  const f = films.find(x=>x.id==id); if (!f) return;
+  document.getElementById('detail-body').innerHTML = `
+    <div class="detail-header">
+      <div class="detail-poster" style="background:${posterGrad(f.genre)}; overflow:hidden;">
+        ${f.poster 
+          ? `<img src="${f.poster}" style="width:100%;height:100%;object-fit:cover;">` 
+          : emoji(f.genre)
+        }
+      </div>
+      <div class="detail-info">
+        <div style="margin-bottom:10px"><span class="card-genre ${gc(f.genre)}">${f.genre}</span></div>
+        <div class="detail-title">${f.judul}</div>
+        <div class="detail-meta"><span>📅 ${f.tahun}</span><span>•</span><span>⭐ ${f.rating} / 10</span></div>
+        <div class="detail-stars">${stars(f.rating,true)}</div>
+      </div>
+      <div class="detail-rc"><div class="detail-rnum">${(+f.rating).toFixed(1)}</div><div class="detail-rlabel">RATING</div></div>
+    </div>
+    <div class="review-label">Review</div>
+    <div class="review-body">${f.review||'Belum ada review untuk film ini.'}</div>
+    <div class="detail-actions">
+      <button class="d-btn d-btn-edit" onclick="openEdit(${f.id});closeDetail()">✏ Edit Film</button>
+      <button class="d-btn d-btn-del" onclick="del(${f.id},'${esc(f.judul)}');closeDetail()">✕ Hapus</button>
+    </div>`;
+  document.getElementById('detail-ov').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDetail(){document.getElementById('detail-ov').classList.remove('open');document.body.style.overflow='';}
+
+/* ── MODAL ── */
+function openAdd(){
+  document.getElementById('modal-ttl').textContent='Tambah Film';
+  document.getElementById('fid').value='';
+  document.getElementById('f-judul').value='';
+  document.getElementById('f-genre').value='';
+  document.getElementById('f-tahun').value='';
+  document.getElementById('f-rating').value='';
+  document.getElementById('f-review').value='';
+  document.getElementById('f-poster').value = '';
+  document.getElementById('r-prev').textContent='—';
+  document.getElementById('btn-sub').textContent='Simpan Film';
+  document.getElementById('modal-ov').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function openEdit(id){
+  const f=films.find(x=>x.id==id); if(!f) return;
+  document.getElementById('modal-ttl').textContent='Edit Film';
+  document.getElementById('fid').value=f.id;
+  document.getElementById('f-judul').value=f.judul;
+  document.getElementById('f-genre').value=f.genre;
+  document.getElementById('f-tahun').value=f.tahun;
+  document.getElementById('f-rating').value=f.rating;
+  document.getElementById('f-review').value=f.review||'';
+  document.getElementById('f-poster').value = f.poster || '';
+  document.getElementById('r-prev').textContent=f.rating;
+  document.getElementById('btn-sub').textContent='Update Film';
+  document.getElementById('modal-ov').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){document.getElementById('modal-ov').classList.remove('open');document.body.style.overflow='';}
+function bgClose(e){if(e.target===document.getElementById('modal-ov'))closeModal();}
+function prevRating(v){document.getElementById('r-prev').textContent=v||'—';}
+
+/* ── SUBMIT ── */
+async function submitForm(e){
+  e.preventDefault();
+  const id=document.getElementById('fid').value;
+  const payload={judul:document.getElementById('f-judul').value.trim(),genre:document.getElementById('f-genre').value,tahun:+document.getElementById('f-tahun').value,rating:+document.getElementById('f-rating').value,review:document.getElementById('f-review').value.trim(), poster:document.getElementById('f-poster').value.trim()};
+  if(id) payload.id=+id;
+  const btn=document.getElementById('btn-sub');
+  btn.disabled=true; btn.textContent='Menyimpan...';
+  try {
+    const r=await fetch(`${API}/${id?'update':'create'}.php`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    const d=await r.json();
+    if(r.ok){toast(d.message||'Berhasil!','success');closeModal();load();}
+    else toast(d.message||'Gagal.','error');
+  } catch{toast('Tidak dapat terhubung ke server.','error');}
+  finally{btn.disabled=false;btn.textContent=id?'Update Film':'Simpan Film';}
+}
+
+/* ── DELETE ── */
+async function del(id,judul){
+  if(!confirm(`Hapus "${judul}"?`)) return;
+  try{
+    const r=await fetch(`${API}/delete.php`,{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
+    const d=await r.json();
+    if(r.ok){toast(`"${judul}" dihapus.`,'success');load();}
+    else toast(d.message||'Gagal.','error');
+  }catch{toast('Tidak dapat terhubung.','error');}
+}
+
+/* ── HELPERS ── */
+function stars(r,lg=false){
+  const v=+r/2; let h='';
+  for(let i=1;i<=5;i++){
+    if(i<=Math.floor(v)) h+=`<span class="star filled">★</span>`;
+    else if(i-.5<=v)     h+=`<span class="star half">★</span>`;
+    else                 h+=`<span class="star">☆</span>`;
+  } return h;
+}
+
+function gc(g){
+  return({'Action':'genre-action','Drama':'genre-drama','Horror':'genre-horror','Comedy':'genre-comedy','Romance':'genre-romance','Animation':'genre-animation','Sci-Fi':'genre-scifi','Thriller':'genre-action'}[g]||'genre-default');
+}
+
+function emoji(g){
+  return({'Action':'⚔️','Drama':'🎭','Horror':'👻','Comedy':'😂','Romance':'💕','Animation':'🎨','Sci-Fi':'🚀','Thriller':'🔪'}[g]||'🎬');
+}
+
+function posterGrad(g){
+  return({'Action':'linear-gradient(135deg,#1a0a0a,#2d0f0f)','Drama':'linear-gradient(135deg,#0a0f1e,#0d1a35)','Horror':'linear-gradient(135deg,#0f0a1a,#180d2d)','Comedy':'linear-gradient(135deg,#1a1505,#2d2208)','Romance':'linear-gradient(135deg,#1a0d0a,#2d1410)','Animation':'linear-gradient(135deg,#0a1a0f,#0d2d18)','Sci-Fi':'linear-gradient(135deg,#071a1a,#0a2d2d)','Thriller':'linear-gradient(135deg,#101010,#1a1a1a)'}[g]||'linear-gradient(135deg,#0d1520,#131c2a)');
+}
+
+function esc(s){return s.replace(/'/g,"\\'").replace(/"/g,'&quot;');}
+
+function toast(msg,type='success'){
+  const c=document.getElementById('toasts');
+  const t=document.createElement('div');
+  t.className=`toast ${type}`;
+  t.innerHTML=`<span>${type==='success'?'✓':'✕'}</span><span>${msg}</span>`;
+  c.appendChild(t);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('show')));
+  setTimeout(()=>{t.classList.remove('show');setTimeout(()=>t.remove(),400);},3000);
+}
+
+load();
+</script>
+</body>
+</html>
